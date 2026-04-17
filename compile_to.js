@@ -1,155 +1,3 @@
-
-<head>
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial;
-      background: #1e1e1e;
-      color: white;
-      overflow: hidden;
-    }
-
-    .topbar {
-      display: flex;
-      background: #2c2c2c;
-      padding: 8px;
-      gap: 8px;
-    }
-
-    .topbar button {
-      background: #444;
-      color: white;
-      border: none;
-      padding: 8px 12px;
-      cursor: pointer;
-    }
-
-.main {
-  display: flex;
-  height: calc(100vh - 40px);
-  overflow: hidden; /* IMPORTANT */
-}
-
-.panel {
-  width: 300px;
-  background: #2a2a2a;
-  padding: 10px;
-
-  height: 100%;        /* fill parent */
-  overflow-y: auto;    /* enable vertical scroll */
-}
-
-    #editor {
-        width: 70%;
-    }
-.block {
-  background: #4c97ff;
-  padding: 10px;
-  margin-bottom: 8px;
-  border-radius: 6px;
-  cursor: pointer;
-  user-select: none;
-  transition: 0.15s;
-}
-
-.block:hover {
-  background: #6aa9ff;
-}
-
-.block.motion { background: #4c97ff; }      /* blue */
-.block.looks { background: #9966ff; }       /* purple */
-.block.sound { background: #d65cd6; }       /* pink */
-.block.event { background: #ffbf00; }      /* yellow */
-.block.control { background: #ffab19; }     /* orange */
-.block.sensing { background: #5cb1d6; }     /* light blue */
-.block.operator { background: #59c059; }   /* green */
-.block.data { background: #ff8c1a; }        /* dark orange */
-.block.myblocks { background: #ff6680; }    /* red/pink */
-
-  </style>
-  <!-- JSZip CDN -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-<script type="module">
-import { default as RenderWebGL } from "https://cdn.jsdelivr.net/npm/scratch-render@2.2.84/+esm";
-
-window.RenderWebGL = RenderWebGL;
-</script>
-<script src="https://cdn.jsdelivr.net/npm/scratch-storage@6.2.1/dist/web/scratch-storage.min.js"></script>
-
-
-<script type="module">
-import scratchAudio from 'https://cdn.jsdelivr.net/npm/scratch-audio@2.0.268/+esm'
-
-window.scratchAudio = scratchAudio
-</script>
-
-
-
-<script src="https://cdn.jsdelivr.net/npm/scratch-vm@5.0.300/dist/web/scratch-vm.min.js"></script>
-
-
-
-
-
-</head>
-
-<body>
-    <div class="topstuff">
-<input type="file" id="fileInput" style="display:none" />
-<!--
-<button onclick="saveSA1()">Save (.sa1)</button>
-<button onclick="loadSA1()">Load (.sa1)</button>
--->
-<button onclick="exportSB3()">Export (.sb3)</button>
-    </div>
-
-
-<div>
-    <div class="topbar">
-    
-    <button onclick="setTab('code')">Code</button>
-    <button onclick="setTab('costumes')">Costumes</button>
-    <button onclick="setTab('sounds')">Sounds</button>
-    </div>
-
-    <div class="main">
-    <!-- Right panel -->
-    <div class="panel" id="blockPANEL">
-
-    </div>
-        <div id="editor"></div>
-    <div class="right">
-        <div id="loading" style="display:none;">Loading project...</div>
-        <button id="greenflag">🟢 Green Flag</button>
-    <button id="stopbtn">⛔ Stop</button>
-        <canvas id="scratch-stage"></canvas>
-
-        <button id="compilebtn">
-            Compile without running
-        </button>
-        <div id="monitors"></div>
-        <p>
-            The preview here is very trash and is missing input, showing vars/lists. 
-        </p>
-        <p>
-            Export this project and import it into turbowarp to preview
-        </p>
-    </div>
-
-
-    </div>
-</div>
-
-
-
-
-
-
-<script src="https://unpkg.com/luaparse@0.3.1/luaparse.js"></script>
-
-<script src="https://unpkg.com/monaco-editor@0.45.0/min/vs/loader.js"></script>
-
-<script>
 async function COMPILE_TO_SB3() {
     await waitForEditor()
 
@@ -169,9 +17,6 @@ async function COMPILE_TO_SB3() {
     let tabs_to_add = {}
     let tabs_to_add_names = {}
     
-    let arg_ids = {}
-    let defaultMUT = {}
-    let input_level_custom  = {}
 
     let core_to_s = {
 
@@ -285,42 +130,6 @@ async function COMPILE_TO_SB3() {
         "hidelist": "data_hidelist",
         "clear_list": "data_deletealloflist",
     }
-    if (!window.blockpanelsetup ) {
-        let blocks = document.getElementById("blockPANEL")
-
-        let pendingh = ""
-
-        for (const i of Object.keys(core_to_s)) {
-            let val = core_to_s[i]
-            const catg = val.split("_")[0]
-
-            pendingh += `<div class="block ${catg}" data-code="${i}">
-                <code>${i}()</code>
-            </div>`
-        }
-
-        blocks.innerHTML = pendingh
-
-        document.getElementById("blockPANEL").addEventListener("click", (e) => {
-            const block = e.target.closest(".block")
-            if (!block) return
-
-            const code = block.dataset.code
-
-            if (window.editor) {
-                editor.focus()
-
-                editor.trigger("keyboard", "type", {
-                    text: code
-                })
-            }
-        })
-
-        window.blockpanelsetup = true
-    }
-
-
-
 
     let INPUT_NAMES = {
 
@@ -440,7 +249,7 @@ async function COMPILE_TO_SB3() {
         "data_deletealloflist": [0],
 
         "sensing_setdragmode": [0],
-        //"sensing_keypressed": [0],
+        "sensing_keypressed": [0],
         "motion_setrotationstyle": [0],
         "looks_changeeffectby": [0],
         "looks_seteffectto": [0],
@@ -455,10 +264,10 @@ async function COMPILE_TO_SB3() {
         "when_key_pressed": [0],
         "when_backdrop_switches_to": [0],
         "control_stop": [0],
-      //  "sensing_touchingobject": [0],
-       // "sensing_touchingcolor": [0],
-      //  "sensing_coloristouchingcolor": [0,1],
-      //  "sensing_distanceto": [0],
+        "sensing_touchingobject": [0],
+        "sensing_touchingcolor": [0],
+        "sensing_coloristouchingcolor": [0,1],
+        "sensing_distanceto": [0],
         "sensing_of": [0],
         "sensing_current": [0],
         "data_showvariable": [0],
@@ -498,7 +307,6 @@ async function COMPILE_TO_SB3() {
         "not": "OPERAND",
         ">=": "OPERAND",
         "<=": "OPERAND",
-        "~=": "OPERAND",
         "..": "STRING",
     }
 
@@ -561,8 +369,8 @@ async function COMPILE_TO_SB3() {
         return true
     }
 
-    function readFOR_INPUT(Stuff, bid, ISCUSTOM) {
-        console.log(Stuff, ISCUSTOM)
+    function readFOR_INPUT(Stuff, bid) {
+        console.log(Stuff)
         if (Stuff["type"] == "NumericLiteral") {
 
             return [
@@ -574,7 +382,7 @@ async function COMPILE_TO_SB3() {
                                 ]
 
         } else if (Stuff["type"] == "UnaryExpression") {
-            const arg = readFOR_INPUT(Stuff["argument"], null, ISCUSTOM)
+            const arg = readFOR_INPUT(Stuff["argument"])
             const oper = Stuff["operator"]
             const ExID = generateBlockId()
             if (oper == "not") {
@@ -653,42 +461,17 @@ async function COMPILE_TO_SB3() {
 
         
         } else if (Stuff["type"] == "Identifier") {
+            let varinfo = get_or_create_var(Stuff["name"])
+            console.warn(Stuff)
 
-            if (ISCUSTOM && arg_ids[ISCUSTOM] && arg_ids[ISCUSTOM][Stuff["name"]]) {
-                let ITSID = generateBlockId()
-                let makestrog =  {
-                    "opcode": "argument_reporter_string_number",
-                    "next": null,
-                    "parent": null,
-                    "inputs": {},
-                    "fields": {
-                        "VALUE": [
-                        Stuff["name"],
-                        null
-                        ]
-                    },
-                    "shadow": true,
-                    "topLevel": false
-                    }
-                blocks_to_add[ITSID] = makestrog
-
-
-                return [3, ITSID]
-            } else {
-
-                let varinfo = get_or_create_var(Stuff["name"])
-                return [
-                3,
-                [
-                    12,
-                    varinfo[0],
-                    varinfo[1]
-                ]
-                ]
-            }
-            
-
-
+            return [
+              3,
+              [
+                12,
+                varinfo[0],
+                varinfo[1]
+              ]
+            ]
         } else if (Stuff["type"] == "StringLiteral") {
             return [
                                 1,
@@ -704,8 +487,8 @@ async function COMPILE_TO_SB3() {
             const oper = Stuff["operator"]
 
       
-            let LV = readFOR_INPUT(Stuff["left"], ExID, ISCUSTOM)
-            let RV = readFOR_INPUT(Stuff["right"], ExID, ISCUSTOM)
+            let LV = readFOR_INPUT(Stuff["left"], ExID)
+            let RV = readFOR_INPUT(Stuff["right"], ExID)
 
             console.log(OperTypes[oper], oper)
 
@@ -874,36 +657,6 @@ async function COMPILE_TO_SB3() {
 
                         blocks_to_add[ExID]["inputs"]["OPERAND1"] = [3, gtID]
                         blocks_to_add[ExID]["inputs"]["OPERAND2"] = [3, eID]
-                    } else if (oper == "~=") {
-
-                        eID = generateBlockId()
-                                    let operA = {
-                                        "opcode": "operator_equals",
-                                        "next": null,
-                                        "parent": ExID,
-                                        "inputs": {
-                                            "OPERAND1": LV,
-                                            "OPERAND2": RV,
-                                        },
-                                        "fields": {},
-                                        "shadow": false,
-                                        "topLevel": false
-                                    }
-                        blocks_to_add[eID] = operA
-
-                        let mainNOT = {
-                                        "opcode": "operator_not",
-                                        "next": null,
-                                        "parent": bid,
-                                        "inputs": {
-                                            "OPERAND": [3, eID],
-                                        },
-                                        "fields": {},
-                                        "shadow": false,
-                                        "topLevel": false
-                                    }
-
-                        blocks_to_add[ExID] = mainNOT
                     }
                 }
 
@@ -944,7 +697,7 @@ async function COMPILE_TO_SB3() {
             for (const i of args) {
                 const isf = fields[inS]?.includes(counter);
 
-                let normalOBJ = readFOR_INPUT(i, EXid, ISCUSTOM)
+                let normalOBJ = readFOR_INPUT(i, EXid)
 
                 if (counter == 1 && inS == "sensing_of") {
                     let skibidi = {
@@ -992,8 +745,8 @@ async function COMPILE_TO_SB3() {
             const ExID = generateBlockId()
             const oper = Stuff["operator"]
 
-            let LV = readFOR_INPUT(Stuff["left"], ExID, ISCUSTOM)
-            let RV = readFOR_INPUT(Stuff["right"], ExID, ISCUSTOM)
+            let LV = readFOR_INPUT(Stuff["left"], ExID)
+            let RV = readFOR_INPUT(Stuff["right"], ExID)
             LV = input_tostring(LV)
             RV = input_tostring(RV)
 
@@ -1025,7 +778,7 @@ async function COMPILE_TO_SB3() {
                 console.log(v)
 
                 if (v["type"] == "TableValue") {
-                    c.push(readFOR_INPUT(v["value"], null, ISCUSTOM))
+                    c.push(readFOR_INPUT(v["value"]))
 
                 } else if (v["type"] == "TableKey") {
                     //2d
@@ -1048,7 +801,7 @@ async function COMPILE_TO_SB3() {
         } else if (Stuff["type"] == "IndexExpression") {
             
 
-            return [readFOR_INPUT(Stuff["base"], null, ISCUSTOM), readFOR_INPUT(Stuff["index"],null,ISCUSTOM)]
+            return [readFOR_INPUT(Stuff["base"]), readFOR_INPUT(Stuff["index"])]
 
             
         } else {
@@ -1165,8 +918,8 @@ function libraryCheck(exid, base, Opcode, args, bid) {
 
 
 
-    function ReadASTrecv(bod, TopLevel, Parent, SubStack, ISCUSTOM) {
-        console.log(bod, ISCUSTOM)
+    function ReadASTrecv(bod, TopLevel, Parent, SubStack) {
+        console.log(bod)
         let CurrentB = Parent
 
         let firstblock;
@@ -1178,13 +931,8 @@ function libraryCheck(exid, base, Opcode, args, bid) {
 
             let bid = generateBlockId()
             if (CurrentB) {
-                if (blocks_to_add[CurrentB]) {
-                    console.log(CurrentB, bid)
-                    blocks_to_add[CurrentB]["next"] = bid
-                } else {
-                    return
-                }
-       
+                console.log(CurrentB, bid)
+                blocks_to_add[CurrentB]["next"] = bid
             }
         
 
@@ -1220,7 +968,6 @@ function libraryCheck(exid, base, Opcode, args, bid) {
 
                     console.log(callname, field1)
                 }
-                console.warn(callname)
 
                 let BLOCK_OPCODE = core_to_s[callname]
                 
@@ -1252,16 +999,6 @@ function libraryCheck(exid, base, Opcode, args, bid) {
                         }
                     }
                 }
-                let isCustomBlock = false
-
-                if (!BLOCK_OPCODE) {
-                    isCustomBlock = true
-
-                        console.warn("CUSTOM BLOCK", i, callname)
-
-                        buildblock["opcode"] = "procedures_call"
-                        buildblock["mutation"] = defaultMUT[callname]
-                }
             
 
                 blocks_to_add[bid] = buildblock
@@ -1269,58 +1006,43 @@ function libraryCheck(exid, base, Opcode, args, bid) {
                 
                 let counterARG = 0
                 for (const i of args) {
-                    if (isCustomBlock) {
-                        if (!input_level_custom[callname]) {
-                            alert("'" + callname + "' is not a valid block or custom block")
-                        }
-                        console.log(i)
-                        let tasdfdfd = input_level_custom[callname][counterARG]
-
-                        let mod2 = tasdfdfd[1]
-
-                        blocks_to_add[bid]["inputs"][tasdfdfd[0]] = readFOR_INPUT(i, null, callname)
-                        
-                    } else {
-                        const isf = (fields[BLOCK_OPCODE] && fields[BLOCK_OPCODE].includes(counterARG))
-                        let toplace = "inputs"
-                        if (isf) {
-                            toplace = "fields"
-                        }
-
-
-                        if (i["type"] == "FunctionDeclaration") {
-                            ReadASTrecv(i["body"], false, bid)
-                        } else if (i["type"] == "NumericLiteral") {
-                            blocks_to_add[bid][toplace][INPUT_NAMES[BLOCK_OPCODE][counterARG]] = readFOR_INPUT(i, null, ISCUSTOM)
-                        } else if (i["type"] == "StringLiteral") {
-                            blocks_to_add[bid][toplace][INPUT_NAMES[BLOCK_OPCODE][counterARG]] = readFOR_INPUT(i, null, ISCUSTOM)
-                        } else if (i["type"] == "BinaryExpression") {
-                            blocks_to_add[bid][toplace][INPUT_NAMES[BLOCK_OPCODE][counterARG]] = readFOR_INPUT(i, null, ISCUSTOM)
-                        } else if (i["type"] == "UnaryExpression") {
-                            blocks_to_add[bid][toplace][INPUT_NAMES[BLOCK_OPCODE][counterARG]] = readFOR_INPUT(i, null, ISCUSTOM)
-                        } else if (i["type"] == "CallExpression") {
-                            blocks_to_add[bid][toplace][INPUT_NAMES[BLOCK_OPCODE][counterARG]] = readFOR_INPUT(i, null, ISCUSTOM)
-                        } else if (i["type"] == "Identifier") {
-                            blocks_to_add[bid][toplace][INPUT_NAMES[BLOCK_OPCODE][counterARG]] = readFOR_INPUT(i, null, ISCUSTOM)
-                        } else if (i["type"] == "MemberExpression") {
-                            base = i["base"]
-                            baseNAME = base["name"]
-                            baseTYPE = base["type"]
-                            console.warn(i.type, i)
-                        } else {
-                            console.warn(i.type)
-                        }
-
-                        if (toplace == "fields") {
-                            let whereplace = blocks_to_add[bid][toplace][INPUT_NAMES[BLOCK_OPCODE][counterARG]]
-
-                            blocks_to_add[bid][toplace][INPUT_NAMES[BLOCK_OPCODE][counterARG]] = [whereplace[1][1], null]
-
-                            console.log(whereplace)
-                        }
+                    const isf = (fields[BLOCK_OPCODE] && fields[BLOCK_OPCODE].includes(counterARG))
+                    let toplace = "inputs"
+                    if (isf) {
+                        toplace = "fields"
                     }
 
 
+                    if (i["type"] == "FunctionDeclaration") {
+                        ReadASTrecv(i["body"], false, bid)
+                    } else if (i["type"] == "NumericLiteral") {
+                        blocks_to_add[bid][toplace][INPUT_NAMES[BLOCK_OPCODE][counterARG]] = readFOR_INPUT(i)
+                    } else if (i["type"] == "StringLiteral") {
+                        blocks_to_add[bid][toplace][INPUT_NAMES[BLOCK_OPCODE][counterARG]] = readFOR_INPUT(i)
+                    } else if (i["type"] == "BinaryExpression") {
+                        blocks_to_add[bid][toplace][INPUT_NAMES[BLOCK_OPCODE][counterARG]] = readFOR_INPUT(i)
+                    } else if (i["type"] == "UnaryExpression") {
+                        blocks_to_add[bid][toplace][INPUT_NAMES[BLOCK_OPCODE][counterARG]] = readFOR_INPUT(i)
+                    } else if (i["type"] == "CallExpression") {
+                        blocks_to_add[bid][toplace][INPUT_NAMES[BLOCK_OPCODE][counterARG]] = readFOR_INPUT(i)
+                    } else if (i["type"] == "Identifier") {
+                        blocks_to_add[bid][toplace][INPUT_NAMES[BLOCK_OPCODE][counterARG]] = readFOR_INPUT(i)                        
+                    } else if (i["type"] == "MemberExpression") {
+                        base = i["base"]
+                        baseNAME = base["name"]
+                        baseTYPE = base["type"]
+                        console.warn(i.type, i)
+                    } else {
+                        console.warn(i.type)
+                    }
+
+                    if (toplace == "fields") {
+                        let whereplace = blocks_to_add[bid][toplace][INPUT_NAMES[BLOCK_OPCODE][counterARG]]
+
+                        blocks_to_add[bid][toplace][INPUT_NAMES[BLOCK_OPCODE][counterARG]] = [whereplace[1][1], null]
+
+                        console.log(whereplace)
+                    }
                     
                     counterARG += 1
                 }
@@ -1433,12 +1155,12 @@ function libraryCheck(exid, base, Opcode, args, bid) {
                 bid = BLOCKID
                 console.log(bid)
 
-                ReadASTrecv(i.body, false, changeID, null, ISCUSTOM)
+                ReadASTrecv(i.body, false, changeID)
                 
                 
             } else if (i.type == "WhileStatement") {
                 console.log(CurrentB)
-                let notblockID = readFOR_INPUT(i.condition, bid, ISCUSTOM)
+                let notblockID = readFOR_INPUT(i.condition, bid)
 
                 console.log(notblockID)
 
@@ -1461,7 +1183,7 @@ function libraryCheck(exid, base, Opcode, args, bid) {
 
                 blocks_to_add[bid] = whileblock
 
-                ReadASTrecv(i.body, false, null, whileblock["inputs"]["SUBSTACK"], ISCUSTOM)
+                ReadASTrecv(i.body, false, null, whileblock["inputs"]["SUBSTACK"])
 
             } else if (i.type == "IfStatement") {
                 
@@ -1471,7 +1193,7 @@ function libraryCheck(exid, base, Opcode, args, bid) {
                     const type2 = j["type"]
                     
                     if (type2 == "IfClause") {
-                        let CONDBOOL = readFOR_INPUT(j.condition, bid,  ISCUSTOM)
+                        let CONDBOOL = readFOR_INPUT(j.condition, bid)
 
 
                         whileblock = {
@@ -1497,14 +1219,14 @@ function libraryCheck(exid, base, Opcode, args, bid) {
                         blocks_to_add[bid] = whileblock
                         lastIF = bid
 
-                        ReadASTrecv(j.body, false, null, whileblock["inputs"]["SUBSTACK"], ISCUSTOM) 
+                        ReadASTrecv(j.body, false, null, whileblock["inputs"]["SUBSTACK"]) 
                     } else if (type2 == "ElseifClause") {
                         if (lastIF) {
 
 
                             thiselse = generateBlockId()
 
-                            let CONDBOOL = readFOR_INPUT(j.condition, thiselse, ISCUSTOM)
+                            let CONDBOOL = readFOR_INPUT(j.condition, thiselse)
                             whileblock = {
                                 "opcode": "control_if_else",
                                 "next": null,
@@ -1527,7 +1249,7 @@ function libraryCheck(exid, base, Opcode, args, bid) {
                             
                             blocks_to_add[thiselse] = whileblock
                           
-                            ReadASTrecv(j.body, false, null, whileblock["inputs"]["SUBSTACK"], ISCUSTOM) 
+                            ReadASTrecv(j.body, false, null, whileblock["inputs"]["SUBSTACK"]) 
 
 
 
@@ -1539,7 +1261,7 @@ function libraryCheck(exid, base, Opcode, args, bid) {
 
                     } else if (type2 == "ElseClause") {
                         if (lastIF) {
-                            ReadASTrecv(j.body, false, null, blocks_to_add[lastIF]["inputs"]["SUBSTACK2"], ISCUSTOM) 
+                            ReadASTrecv(j.body, false, null, blocks_to_add[lastIF]["inputs"]["SUBSTACK2"]) 
                         }
 
                     }
@@ -1595,7 +1317,7 @@ function libraryCheck(exid, base, Opcode, args, bid) {
                     for (const J of i.init) {
                         let VARname = i.variables[counter]["name"]
 
-                        const value = readFOR_INPUT(J, bid, ISCUSTOM)
+                        const value = readFOR_INPUT(J, bid)
 
                         console.log(value)
 
@@ -1676,7 +1398,7 @@ function libraryCheck(exid, base, Opcode, args, bid) {
                         blocks_to_add[bid] = wipeLIST
 
 
-                        const value = readFOR_INPUT(J, bid, ISCUSTOM)
+                        const value = readFOR_INPUT(J, bid)
                         let lastB = bid
 
             
@@ -1716,125 +1438,7 @@ function libraryCheck(exid, base, Opcode, args, bid) {
                 }
 
 
-            } else if (i.type == "FunctionDeclaration") {
-                console.warn("FUNC", i)
-                const funcNAME = i["identifier"]["name"]
-                const body = i["body"]
 
-                const parameters = i["parameters"]
-
-                DefID = generateBlockId()
-                ProID = generateBlockId()
-
-                let DefITEM = {
-                    "opcode": "procedures_definition",
-                    "next": null, //first block inside
-                    "parent": null,
-                    "inputs": {
-                        "custom_block": [
-                        1,
-                        ProID
-                        ]
-                    },
-                    "fields": {},
-                    "shadow": false,
-                    "topLevel": true,
-                    "x": 0,
-                    "y": 0
-                }
-                blocks_to_add[DefID] = DefITEM
-
-                let params = []
-
-                let counter = 0
-                for (const i of parameters) {
-                    name = i["name"]
-                    Pid = generateBlockId()
-                    Argid = generateBlockId()
-                    params.push([Pid, name, Argid])
-
-
-                    let repob = {
-                    "opcode": "argument_reporter_string_number",
-                    "next": null,
-                    "parent": ProID,
-                    "inputs": {},
-                    "fields": {
-                        "VALUE": [
-                        name,
-                        null
-                        ]
-                    },
-                    "shadow": true,
-                    "topLevel": false
-                    }
-
-                    blocks_to_add[Pid] = repob
-
-                    if (! arg_ids[funcNAME]) {
-                         arg_ids[funcNAME] = {}
-                    }
-
-                    arg_ids[funcNAME][name] = [Pid, name, Argid]
-
-                    if (!input_level_custom[funcNAME]) {
-                         input_level_custom[funcNAME] = {}
-                    }
-
-                    input_level_custom[funcNAME][counter] = [Argid, [1,[10, name]]]
-
-
-                    counter += 1
-                }
-
-                console.log(params)
-
-                let ProITEM = {
-                    "opcode": "procedures_prototype",
-                    "next": null,
-                    "parent": DefID,
-                    "inputs": {},
-                    "fields": {},
-                    "shadow": true,
-                    "topLevel": false,
-                    "mutation": {
-                        "tagName": "mutation",
-                        "children": [],
-                        "proccode": null,
-                        "argumentids": null,
-                        "argumentnames": null,
-                        "argumentdefaults": null,
-                        "warp": "true"
-                    }
-                }
-                let mutID = []
-                let mutName = []
-                let mutDef = []
-                let customName = funcNAME + " "
-
-                for (const i of params) {
-                    ProITEM["inputs"][i[2]] = [1, i[0]]
-
-                    mutID.push(i[2])
-                    mutName.push(i[1])
-                    mutDef.push("")
-                    customName += "%s "
-                }
-
-                ProITEM["mutation"]["argumentids"] = JSON.stringify(mutID)
-                ProITEM["mutation"]["argumentnames"] = JSON.stringify(mutName)
-                ProITEM["mutation"]["argumentdefaults"] = JSON.stringify(mutDef)
-                ProITEM["mutation"]["proccode"] = customName.trim()
-                blocks_to_add[ProID] = ProITEM
-                defaultMUT[funcNAME] = structuredClone(ProITEM["mutation"])
-                delete defaultMUT[funcNAME]["argumentdefaults"]
-                delete defaultMUT[funcNAME]["argumentnames"]
-
-
-
-                ReadASTrecv(body, false, DefID, null, funcNAME)
-
-                console.log(funcNAME, body)
             
             } else {
                 console.warn(i.type)
@@ -1891,173 +1495,3 @@ function libraryCheck(exid, base, Opcode, args, bid) {
 
  
 }
-
-
-
-</script>
-
-<script>
-
-let projectData = {
-    name: "My Project",
-    sprites: [],
-    scripts: []
-};
-function waitForEditor() {
-    return new Promise((resolve) => {
-        const check = () => {
-            if (window.editor && window.editor.getValue) {
-                resolve(window.editor);
-            } else {
-                setTimeout(check, 100);
-            }
-        };
-        check();
-    });
-}
-
-window.baseSB3 = null
-
-async function loadBASEsb3() {
-    const res = await fetch("BASE.sb3");
-    const arrayBuffer = await res.arrayBuffer();
-
-    const zip = new JSZip();
-
-    console.log(arrayBuffer)
-    // 🔥 load zip from binary data
-    const loadedZip = await zip.loadAsync(arrayBuffer);
-
-    window.baseSB3 = loadedZip
-    console.log(baseSB3)
-}
-
-loadBASEsb3();
-
-function waitForBaseSB3() {
-    return new Promise((resolve) => {
-        const check = () => {
-            if (window.baseSB3) {
-                resolve(window.baseSB3);
-            } else {
-                setTimeout(check, 100);
-            }
-        };
-        check();
-    });
-}
-
-function generateBlockId() {
-    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-    let id = "";
-
-    for (let i = 0; i < 20; i++) {
-        id += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-
-    return id;
-}
-function cloneZip(zip) {
-    const newZip = new JSZip();
-
-    zip.forEach((relativePath, file) => {
-        if (!file.dir) {
-            newZip.file(relativePath, file.async("arraybuffer"));
-        }
-    });
-
-    return newZip;
-}
-
-
-async function vmstuff() {
-      const canvas = document.getElementById("scratch-stage");
-
-    const vm = new window.VirtualMachine();
-
-    const storage = new ScratchStorage.ScratchStorage();
-    vm.attachStorage(storage);
-
-    while (!window.RenderWebGL) {
-        await new Promise(r => setTimeout(r, 100));
-    }
-
-    const renderer = new window.RenderWebGL(canvas);
-
-    vm.attachRenderer(renderer);
-
-    while (!window.scratchAudio) {
-        await new Promise(r => setTimeout(r, 100));
-    }
-    vm.attachAudioEngine(new window.scratchAudio());
-
-document.getElementById("stopbtn").onclick = function () {
-    vm.runtime.stopAll();
-};
-
-async function compile_and_display() {
-    // 🔥 show loading UI
-    document.getElementById("loading").style.display = "block";
-
-    const sb3 = await COMPILE_TO_SB3();
-    const arrayBuffer = await sb3.arrayBuffer();
-  
-
-    // ✅ FULLY await project load
-    await vm.loadProject(arrayBuffer);
-
-    vm.start();
-
-    // hide loading only after everything is ready
-    document.getElementById("loading").style.display = "none";
-}
-
-document.getElementById("greenflag").onclick = async function () {
-    await compile_and_display()
-    vm.greenFlag();
-};
-
-
-compile_and_display()
-document.getElementById("compilebtn").onclick = compile_and_display
-
-}
-
-
-vmstuff()
-
-
-// --- SAVE (.sa1) ---
-async function saveSA1() {
-    alert("not supported yet. just copy and paste your code instead")
-}
-
-// --- LOAD (.sa1) ---
-function loadSA1() {
-    alert("not supported yet. just copy and paste your code instead")
-}
-
-// --- EXPORT (.sb3) ---
-async function exportSB3() {
-    const sb3 = await COMPILE_TO_SB3()
-    console.log(sb3)
-
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(sb3);
-    a.download = "project.sb3";
-    a.click();  
-}
-
-document.addEventListener("keydown", function (e) {
-    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "s") {
-        e.preventDefault(); // stop browser save page dialog
-        saveSA1();
-        console.log("Saved .sa1");
-    }
-});
-
-</script>
-<script src="code.js"></script>
-
-
-</body>
