@@ -1,6 +1,11 @@
-example
-<img width="343" height="251" alt="image" src="https://github.com/user-attachments/assets/75ef52b0-8ed0-4e75-8b80-96d6da86bffa" />
-<img width="401" height="523" alt="image" src="https://github.com/user-attachments/assets/589bccef-dc02-4f08-8c2f-b743ba48dc5b" />
+Some math example
+<img width="455" height="707" alt="image" src="https://github.com/user-attachments/assets/303958f7-a89b-410f-96e8-09e4608d3c61" />
+converted - >
+<img width="981" height="977" alt="image" src="https://github.com/user-attachments/assets/1c05f596-5bc1-4d3f-b968-77a4648ffc5d" />
+
+
+
+
 
 custom blocks
 <img width="311" height="183" alt="image" src="https://github.com/user-attachments/assets/f7676989-c65a-414d-a418-be878156a58e" />
