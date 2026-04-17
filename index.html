@@ -1,0 +1,155 @@
+
+<head>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial;
+      background: #1e1e1e;
+      color: white;
+      overflow: hidden;
+    }
+
+    .topbar {
+      display: flex;
+      background: #2c2c2c;
+      padding: 8px;
+      gap: 8px;
+    }
+
+    .topbar button {
+      background: #444;
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      cursor: pointer;
+    }
+
+.main {
+  display: flex;
+  height: calc(100vh - 40px);
+  overflow: hidden; /* IMPORTANT */
+}
+
+.panel {
+  width: 300px;
+  background: #2a2a2a;
+  padding: 10px;
+
+  height: 100%;        /* fill parent */
+  overflow-y: auto;    /* enable vertical scroll */
+}
+
+    #editor {
+        width: 70%;
+    }
+.block {
+  background: #4c97ff;
+  padding: 10px;
+  margin-bottom: 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  user-select: none;
+  transition: 0.15s;
+}
+
+.block:hover {
+  background: #6aa9ff;
+}
+
+.block.motion { background: #4c97ff; }      /* blue */
+.block.looks { background: #9966ff; }       /* purple */
+.block.sound { background: #d65cd6; }       /* pink */
+.block.event { background: #ffbf00; }      /* yellow */
+.block.control { background: #ffab19; }     /* orange */
+.block.sensing { background: #5cb1d6; }     /* light blue */
+.block.operator { background: #59c059; }   /* green */
+.block.data { background: #ff8c1a; }        /* dark orange */
+.block.myblocks { background: #ff6680; }    /* red/pink */
+
+  </style>
+  <!-- JSZip CDN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script type="module">
+import { default as RenderWebGL } from "https://cdn.jsdelivr.net/npm/scratch-render@2.2.84/+esm";
+
+window.RenderWebGL = RenderWebGL;
+</script>
+<script src="https://cdn.jsdelivr.net/npm/scratch-storage@6.2.1/dist/web/scratch-storage.min.js"></script>
+
+
+<script type="module">
+import scratchAudio from 'https://cdn.jsdelivr.net/npm/scratch-audio@2.0.268/+esm'
+
+window.scratchAudio = scratchAudio
+</script>
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/scratch-vm@5.0.300/dist/web/scratch-vm.min.js"></script>
+
+
+
+
+
+</head>
+
+<body>
+    <div class="topstuff">
+<input type="file" id="fileInput" style="display:none" />
+<!--
+<button onclick="saveSA1()">Save (.sa1)</button>
+<button onclick="loadSA1()">Load (.sa1)</button>
+-->
+<button onclick="exportSB3()">Export (.sb3)</button>
+    </div>
+
+
+<div>
+    <div class="topbar">
+    
+    <button onclick="setTab('code')">Code</button>
+    <button onclick="setTab('costumes')">Costumes</button>
+    <button onclick="setTab('sounds')">Sounds</button>
+    </div>
+
+    <div class="main">
+    <!-- Right panel -->
+    <div class="panel" id="blockPANEL">
+
+    </div>
+        <div id="editor"></div>
+    <div class="right">
+        <div id="loading" style="display:none;">Loading project...</div>
+        <button id="greenflag">🟢 Green Flag</button>
+    <button id="stopbtn">⛔ Stop</button>
+        <canvas id="scratch-stage"></canvas>
+
+        <button id="compilebtn">
+            Compile without running
+        </button>
+        <div id="monitors"></div>
+        <p>
+            The preview here is very trash and is missing input, showing vars/lists. 
+        </p>
+        <p>
+            Export this project and import it into turbowarp to preview
+        </p>
+    </div>
+
+
+    </div>
+</div>
+
+
+<script src="https://unpkg.com/luaparse@0.3.1/luaparse.js"></script>
+
+<script src="https://unpkg.com/monaco-editor@0.45.0/min/vs/loader.js"></script>
+
+<script src="compiler.js"></script>
+
+<script>
+const _0x2df7e8=_0x21ec;(function(_0x1084c2,_0x4c8628){const _0x5aefcc=_0x21ec,_0x13ea0c=_0x1084c2();while(!![]){try{const _0xf4ac62=parseInt(_0x5aefcc(0x127))/0x1*(parseInt(_0x5aefcc(0x152))/0x2)+-parseInt(_0x5aefcc(0x12a))/0x3*(parseInt(_0x5aefcc(0x137))/0x4)+parseInt(_0x5aefcc(0x135))/0x5+-parseInt(_0x5aefcc(0x13d))/0x6+-parseInt(_0x5aefcc(0x148))/0x7*(-parseInt(_0x5aefcc(0x163))/0x8)+parseInt(_0x5aefcc(0x157))/0x9+-parseInt(_0x5aefcc(0x13a))/0xa;if(_0xf4ac62===_0x4c8628)break;else _0x13ea0c['push'](_0x13ea0c['shift']());}catch(_0x693210){_0x13ea0c['push'](_0x13ea0c['shift']());}}}(_0x9d8f,0x7ac81));let projectData={'name':_0x2df7e8(0x153),'sprites':[],'scripts':[]};function _0x9d8f(){const _0x2de81c=['bind','console','start','info','1mKbFgL','stopbtn','greenflag','144rOuQgj','random','click','search','apply','getValue','project.sb3','loadAsync','href','loadProject','log','1736225rJsLgX','compilebtn','3088wjWTGg','display','ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz','432520kZbhxC','style','metaKey','3443448cXwoim','VirtualMachine','keydown','arrayBuffer','greenFlag','key','onclick','charAt','floor','forEach','createObjectURL','1403612ENajJf','scratchAudio','dir','length','table','baseSB3','download','async','toString','file','100858myCxHf','My\x20Project','block','getElementById','prototype','5030451XifvJA','runtime','Saved\x20.sa1','RenderWebGL','preventDefault','constructor','trace','attachStorage','ScratchStorage','arraybuffer','attachAudioEngine','exception','8mJTJAU','loading','editor','(((.+)+)+)+$','not\x20supported\x20yet.\x20just\x20copy\x20and\x20paste\x20your\x20code\x20instead'];_0x9d8f=function(){return _0x2de81c;};return _0x9d8f();}function waitForEditor(){return new Promise(_0x2ae562=>{const _0x57a67e=()=>{const _0x52d2f5=_0x21ec;window[_0x52d2f5(0x120)]&&window[_0x52d2f5(0x120)][_0x52d2f5(0x12f)]?_0x2ae562(window[_0x52d2f5(0x120)]):setTimeout(_0x57a67e,0x64);};_0x57a67e();});}window[_0x2df7e8(0x14d)]=null;async function loadBASEsb3(){const _0x4e8640=_0x2df7e8,_0x3994bf=(function(){let _0x54b03b=!![];return function(_0x44d983,_0x4ce776){const _0x406081=_0x54b03b?function(){const _0x10bfbf=_0x21ec;if(_0x4ce776){const _0x20cccc=_0x4ce776[_0x10bfbf(0x12e)](_0x44d983,arguments);return _0x4ce776=null,_0x20cccc;}}:function(){};return _0x54b03b=![],_0x406081;};}()),_0x1583fc=_0x3994bf(this,function(){const _0x4a4dfb=_0x21ec;return _0x1583fc[_0x4a4dfb(0x150)]()[_0x4a4dfb(0x12d)](_0x4a4dfb(0x121))[_0x4a4dfb(0x150)]()[_0x4a4dfb(0x15c)](_0x1583fc)[_0x4a4dfb(0x12d)]('(((.+)+)+)+$');});_0x1583fc();const _0x52f10c=(function(){let _0x59d35f=!![];return function(_0x3fa9cc,_0x48bd25){const _0x2a25e4=_0x59d35f?function(){if(_0x48bd25){const _0x4137d9=_0x48bd25['apply'](_0x3fa9cc,arguments);return _0x48bd25=null,_0x4137d9;}}:function(){};return _0x59d35f=![],_0x2a25e4;};}()),_0x578421=_0x52f10c(this,function(){const _0x4e87f7=_0x21ec,_0x36541c=function(){let _0x6b390c;try{_0x6b390c=Function('return\x20(function()\x20'+'{}.constructor(\x22return\x20this\x22)(\x20)'+');')();}catch(_0x1f2a1f){_0x6b390c=window;}return _0x6b390c;},_0x31247d=_0x36541c(),_0x1c2355=_0x31247d['console']=_0x31247d[_0x4e87f7(0x124)]||{},_0x4266c9=['log','warn',_0x4e87f7(0x126),'error',_0x4e87f7(0x162),_0x4e87f7(0x14c),_0x4e87f7(0x15d)];for(let _0x36bf91=0x0;_0x36bf91<_0x4266c9[_0x4e87f7(0x14b)];_0x36bf91++){const _0x2f9873=_0x52f10c['constructor'][_0x4e87f7(0x156)][_0x4e87f7(0x123)](_0x52f10c),_0x48f4fe=_0x4266c9[_0x36bf91],_0x245706=_0x1c2355[_0x48f4fe]||_0x2f9873;_0x2f9873['__proto__']=_0x52f10c[_0x4e87f7(0x123)](_0x52f10c),_0x2f9873[_0x4e87f7(0x150)]=_0x245706[_0x4e87f7(0x150)][_0x4e87f7(0x123)](_0x245706),_0x1c2355[_0x48f4fe]=_0x2f9873;}});_0x578421();const _0x5124b8=await fetch('/BASE.sb3'),_0x317271=await _0x5124b8['arrayBuffer'](),_0x5c1597=new JSZip();console[_0x4e8640(0x134)](_0x317271);const _0x6c9e68=await _0x5c1597[_0x4e8640(0x131)](_0x317271);window[_0x4e8640(0x14d)]=_0x6c9e68,console[_0x4e8640(0x134)](baseSB3);}loadBASEsb3();function waitForBaseSB3(){return new Promise(_0x59cb81=>{const _0x5b43b6=()=>{const _0x1ebf87=_0x21ec;window[_0x1ebf87(0x14d)]?_0x59cb81(window[_0x1ebf87(0x14d)]):setTimeout(_0x5b43b6,0x64);};_0x5b43b6();});}function generateBlockId(){const _0x3fc5d6=_0x2df7e8,_0x2adbca=_0x3fc5d6(0x139);let _0x478c1d='';for(let _0x4f7ec3=0x0;_0x4f7ec3<0x14;_0x4f7ec3++){_0x478c1d+=_0x2adbca[_0x3fc5d6(0x144)](Math[_0x3fc5d6(0x145)](Math[_0x3fc5d6(0x12b)]()*_0x2adbca[_0x3fc5d6(0x14b)]));}return _0x478c1d;}function cloneZip(_0x37b497){const _0xd039d0=_0x2df7e8,_0x536431=new JSZip();return _0x37b497[_0xd039d0(0x146)]((_0x443593,_0x2a7909)=>{const _0x5e49c0=_0xd039d0;!_0x2a7909[_0x5e49c0(0x14a)]&&_0x536431[_0x5e49c0(0x151)](_0x443593,_0x2a7909[_0x5e49c0(0x14f)](_0x5e49c0(0x160)));}),_0x536431;}async function vmstuff(){const _0x141fdc=_0x2df7e8,_0x3cc626=document[_0x141fdc(0x155)]('scratch-stage'),_0x2d7597=new window[(_0x141fdc(0x13e))](),_0x35b74e=new ScratchStorage[(_0x141fdc(0x15f))]();_0x2d7597[_0x141fdc(0x15e)](_0x35b74e);while(!window[_0x141fdc(0x15a)]){await new Promise(_0x4f992d=>setTimeout(_0x4f992d,0x64));}const _0x314d90=new window[(_0x141fdc(0x15a))](_0x3cc626);_0x2d7597['attachRenderer'](_0x314d90),_0x2d7597[_0x141fdc(0x161)](new window[(_0x141fdc(0x149))]()),document['getElementById'](_0x141fdc(0x128))['onclick']=function(){const _0x255ef8=_0x141fdc;_0x2d7597[_0x255ef8(0x158)]['stopAll']();};async function _0x3da22a(){const _0xf7acc1=_0x141fdc;document[_0xf7acc1(0x155)](_0xf7acc1(0x164))[_0xf7acc1(0x13b)]['display']=_0xf7acc1(0x154);const _0x2f57d6=await COMPILE_TO_SB3(),_0x1dad92=await _0x2f57d6[_0xf7acc1(0x140)]();await _0x2d7597[_0xf7acc1(0x133)](_0x1dad92),_0x2d7597[_0xf7acc1(0x125)](),document[_0xf7acc1(0x155)](_0xf7acc1(0x164))[_0xf7acc1(0x13b)][_0xf7acc1(0x138)]='none';}document[_0x141fdc(0x155)](_0x141fdc(0x129))[_0x141fdc(0x143)]=async function(){const _0x56ee6a=_0x141fdc;await _0x3da22a(),_0x2d7597[_0x56ee6a(0x141)]();},_0x3da22a(),document[_0x141fdc(0x155)](_0x141fdc(0x136))[_0x141fdc(0x143)]=_0x3da22a;}vmstuff();async function saveSA1(){alert('not\x20supported\x20yet.\x20just\x20copy\x20and\x20paste\x20your\x20code\x20instead');}function loadSA1(){const _0x30fef7=_0x2df7e8;alert(_0x30fef7(0x122));}function _0x21ec(_0x24f81d,_0x2d30e4){_0x24f81d=_0x24f81d-0x120;const _0xda9e4d=_0x9d8f();let _0x15739f=_0xda9e4d[_0x24f81d];return _0x15739f;}async function exportSB3(){const _0x57b92c=_0x2df7e8,_0x26dde6=await COMPILE_TO_SB3();console[_0x57b92c(0x134)](_0x26dde6);const _0x32ed23=document['createElement']('a');_0x32ed23[_0x57b92c(0x132)]=URL[_0x57b92c(0x147)](_0x26dde6),_0x32ed23[_0x57b92c(0x14e)]=_0x57b92c(0x130),_0x32ed23[_0x57b92c(0x12c)]();}document['addEventListener'](_0x2df7e8(0x13f),function(_0x5d065b){const _0x3c62f9=_0x2df7e8;(_0x5d065b['ctrlKey']||_0x5d065b[_0x3c62f9(0x13c)])&&_0x5d065b[_0x3c62f9(0x142)]['toLowerCase']()==='s'&&(_0x5d065b[_0x3c62f9(0x15b)](),saveSA1(),console[_0x3c62f9(0x134)](_0x3c62f9(0x159)));});
+</script>
+
+
+</body>
