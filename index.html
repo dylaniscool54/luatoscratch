@@ -235,6 +235,9 @@ async function vmstuff() {
     const renderer = new window.RenderWebGL(canvas);
 
     vm.attachRenderer(renderer);
+    while (!window.scratchAudio) {
+        await new Promise(r => setTimeout(r, 100));
+    }
 
     vm.attachAudioEngine(new window.scratchAudio());
 
