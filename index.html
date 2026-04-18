@@ -109,6 +109,14 @@
 
 
     sendToExtension("test")
+
+
+    window.addEventListener("message", (event) => {
+        if (event.data?.type === "FROM_EXTENSION") {
+            console.log(event);
+        }
+    });
+
 </script>
 
 
