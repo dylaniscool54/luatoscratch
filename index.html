@@ -95,8 +95,6 @@
 
 
 
-<script src="https://unpkg.com/luaparse@0.3.1/luaparse.js"></script>
-
 <script src="https://unpkg.com/monaco-editor@0.45.0/min/vs/loader.js"></script>
 
 <script>
@@ -1824,9 +1822,7 @@ function libraryCheck(exid, base, Opcode, args, bid) {
 
 
     console.log(blocks_to_add)
-
-    sendToExtension(["get_base_JSON", 0])
-
+    
     await waitForBaseJSON()
 
     const project = window.baseJSON
@@ -1987,9 +1983,8 @@ end)
 window.editor.onDidChangeModelContent(() => {
     console.log("Text changed!");
     const luaCode = window.editor.getValue();
-    const ast = luaparse.parse(luaCode)
     
-    sendToExtension(ast)
+    sendToExtension(luaCode)
 });
 
 
