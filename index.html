@@ -108,6 +108,7 @@
         if (event.data?.type === "update_code") {
 
             console.log("upt", event.data.data)
+            window.editor.setValue(event.data.data);
         }
     });
 
@@ -271,21 +272,7 @@ require.config({ paths: { vs: "https://unpkg.com/monaco-editor@0.45.0/min/vs" } 
 
 require(["vs/editor/editor.main"], function () {
     window.editor = monaco.editor.create(document.getElementById("editor"), {
-        value: `
-when_flag_clicked:Connect(function()
-    while true do
-        pointtowards("_mouse_")
-        movesteps(1)
-        if touching_obj("_mouse_") then
-            say("Touching Mouse")
-        else
-            say("Not Touching")
-        end
-    end
-end)
-
-
-`,
+        value: `--Welcome to LuaToScratch v1`,
         language: "lua",
         theme: "vs-dark",
         automaticLayout: true
