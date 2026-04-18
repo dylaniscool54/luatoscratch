@@ -40,7 +40,7 @@
 }
 
     #editor {
-        width: 70%;
+        width: 100%;
     }
 .block {
   background: #4c97ff;
@@ -69,25 +69,6 @@
   </style>
   <!-- JSZip CDN -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-<script type="module">
-import { default as RenderWebGL } from "https://cdn.jsdelivr.net/npm/scratch-render@2.2.84/+esm";
-
-window.RenderWebGL = RenderWebGL;
-</script>
-<script src="https://cdn.jsdelivr.net/npm/scratch-storage@6.2.1/dist/web/scratch-storage.min.js"></script>
-
-
-<script type="module">
-import scratchAudio from 'https://cdn.jsdelivr.net/npm/scratch-audio@2.0.268/+esm'
-
-window.scratchAudio = scratchAudio
-</script>
-
-
-
-<script src="https://cdn.jsdelivr.net/npm/scratch-vm@5.0.300/dist/web/scratch-vm.min.js"></script>
-
-
 
 
 
@@ -96,21 +77,9 @@ window.scratchAudio = scratchAudio
 <body>
     <div class="topstuff">
 <input type="file" id="fileInput" style="display:none" />
-<!--
-<button onclick="saveSA1()">Save (.sa1)</button>
-<button onclick="loadSA1()">Load (.sa1)</button>
--->
-<button onclick="exportSB3()">Export (.sb3)</button>
-    </div>
-
 
 <div>
-    <div class="topbar">
-    
-    <button onclick="setTab('code')">Code</button>
-    <button onclick="setTab('costumes')">Costumes</button>
-    <button onclick="setTab('sounds')">Sounds</button>
-    </div>
+
 
     <div class="main">
     <!-- Right panel -->
@@ -118,25 +87,6 @@ window.scratchAudio = scratchAudio
 
     </div>
         <div id="editor"></div>
-    <div class="right">
-        <div id="loading" style="display:none;">Loading project...</div>
-        <button id="greenflag">🟢 Green Flag</button>
-    <button id="stopbtn">⛔ Stop</button>
-        <canvas id="scratch-stage"></canvas>
-
-        <button id="compilebtn">
-            Compile without running
-        </button>
-        <div id="monitors"></div>
-        <p>
-            The preview here is very trash and is missing input, showing vars/lists. 
-        </p>
-        <p>
-            Export this project and import it into turbowarp to preview
-        </p>
-    </div>
-
-
     </div>
 </div>
 
@@ -150,13 +100,8 @@ window.scratchAudio = scratchAudio
 <script src="https://unpkg.com/monaco-editor@0.45.0/min/vs/loader.js"></script>
 
 <script>
-async function COMPILE_TO_SB3() {
-    await waitForEditor()
+async function COMPILE_TO_SB3(SETUPBLOCKS_ONLY) {
 
-    const luaCode = window.editor.getValue();
-    const ast = luaparse.parse(luaCode)
-
-    console.log(ast)
 
     let blocks_to_add = {}
 
@@ -318,8 +263,17 @@ async function COMPILE_TO_SB3() {
 
         window.blockpanelsetup = true
     }
+    if (SETUPBLOCKS_ONLY) {
+        return
+    }
 
+    
+    await waitForEditor()
 
+    const luaCode = window.editor.getValue();
+    const ast = luaparse.parse(luaCode)
+
+    console.log(ast)
 
 
     let INPUT_NAMES = {
@@ -1897,12 +1851,9 @@ function libraryCheck(exid, base, Opcode, args, bid) {
 </script>
 
 <script>
+COMPILE_TO_SB3(true)
 
-let projectData = {
-    name: "My Project",
-    sprites: [],
-    scripts: []
-};
+
 function waitForEditor() {
     return new Promise((resolve) => {
         const check = () => {
@@ -1932,7 +1883,6 @@ async function loadBASEsb3() {
     console.log(baseSB3)
 }
 
-loadBASEsb3();
 
 function waitForBaseSB3() {
     return new Promise((resolve) => {
@@ -1969,76 +1919,7 @@ function cloneZip(zip) {
     return newZip;
 }
 
-
-async function vmstuff() {
-      const canvas = document.getElementById("scratch-stage");
-
-    const vm = new window.VirtualMachine();
-
-    const storage = new ScratchStorage.ScratchStorage();
-    vm.attachStorage(storage);
-
-    while (!window.RenderWebGL) {
-        await new Promise(r => setTimeout(r, 100));
-    }
-
-    const renderer = new window.RenderWebGL(canvas);
-
-    vm.attachRenderer(renderer);
-
-    while (!window.scratchAudio) {
-        await new Promise(r => setTimeout(r, 100));
-    }
-    vm.attachAudioEngine(new window.scratchAudio());
-
-document.getElementById("stopbtn").onclick = function () {
-    vm.runtime.stopAll();
-};
-
-async function compile_and_display() {
-    // 🔥 show loading UI
-    document.getElementById("loading").style.display = "block";
-
-    const sb3 = await COMPILE_TO_SB3();
-    const arrayBuffer = await sb3.arrayBuffer();
-  
-
-    // ✅ FULLY await project load
-    await vm.loadProject(arrayBuffer);
-
-    vm.start();
-
-    // hide loading only after everything is ready
-    document.getElementById("loading").style.display = "none";
-}
-
-document.getElementById("greenflag").onclick = async function () {
-    await compile_and_display()
-    vm.greenFlag();
-};
-
-
-compile_and_display()
-document.getElementById("compilebtn").onclick = compile_and_display
-
-}
-
-
-vmstuff()
-
-
-// --- SAVE (.sa1) ---
-async function saveSA1() {
-    alert("not supported yet. just copy and paste your code instead")
-}
-
-// --- LOAD (.sa1) ---
-function loadSA1() {
-    alert("not supported yet. just copy and paste your code instead")
-}
-
-// --- EXPORT (.sb3) ---
-async function exportSB3() {
+async function InjectToScratch() {
     const sb3 = await COMPILE_TO_SB3()
     console.log(sb3)
 
