@@ -108,7 +108,7 @@
     }
     window.addEventListener("message", (event) => {
         if (event.data?.type === "FROM_EXTENSION") {
-            if (event.data[0] == "basesb3") {
+            if (event.data.data[0] == "basesb3") {
                 window.baseSB3 = event.data[1]
             }
         }
