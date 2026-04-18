@@ -108,8 +108,8 @@
     }
     window.addEventListener("message", (event) => {
         if (event.data?.type === "FROM_EXTENSION") {
-            if (event.data.data[0] == "basesb3") {
-                window.baseSB3 = event.data[1]
+            if (event.data.data[0] == "baseJSON") {
+                window.baseJSON = event.data[1]
             }
         }
     });
@@ -1825,14 +1825,11 @@ function libraryCheck(exid, base, Opcode, args, bid) {
 
     console.log(blocks_to_add)
 
-    sendToExtension(["get_base_sb3", 0])
+    sendToExtension(["get_base_JSON", 0])
 
-    await waitForBaseSB3()
-    let baseZip = cloneZip(window.baseSB3)
-    const jsonText = await baseZip.file("project.json").async("string");
-    const project = JSON.parse(jsonText);
-    const stage = project["targets"][0]
-    let target = project["targets"][1] //first sprite
+    await waitForBaseJSON()
+
+    const project = window.baseJSON
 
     for (const id in blocks_to_add) {
         target.blocks[id] = blocks_to_add[id];
@@ -1851,15 +1848,8 @@ function libraryCheck(exid, base, Opcode, args, bid) {
     }
 
     console.log("NEW", project)
-
-    baseZip.file(
-        "project.json",
-        JSON.stringify(project, null, 2)
-    );
-
-    const blob = await baseZip.generateAsync({ type: "blob" });
-
-    return blob
+    const NEWMADE = JSON.stringify(project, null, 2)
+    return NEWMADE
 
  
 }
@@ -1885,14 +1875,14 @@ function waitForEditor() {
     });
 }
 
-window.baseSB3 = null
+window.baseJSON = null
 
 
-function waitForBaseSB3() {
+function waitForBaseJSON() {
     return new Promise((resolve) => {
         const check = () => {
-            if (window.baseSB3) {
-                resolve(window.baseSB3);
+            if (window.baseJSON) {
+                resolve(window.baseJSON);
             } else {
                 setTimeout(check, 100);
             }
@@ -1955,13 +1945,8 @@ async function InjectToScratch() {
     try {
         clearError();
 
-        const sb3 = await COMPILE_TO_SB3();
-        console.log(sb3);
-
-        const a = document.createElement("a");
-        a.href = URL.createObjectURL(sb3);
-        a.download = "project.sb3";
-        a.click();
+        const projectJSON = await COMPILE_TO_SB3();
+        console.log(projectJSON);
 
     } catch (err) {
         console.error(err);
