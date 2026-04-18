@@ -1241,7 +1241,7 @@ function libraryCheck(exid, base, Opcode, args, bid) {
                 for (const i of args) {
                     if (isCustomBlock) {
                         if (!input_level_custom[callname]) {
-                            alert("'" + callname + "' is not a valid block or custom block")
+                            throw new Error(`'${callname}' is not a valid block or custom block`);
                         }
                         console.log(i)
                         let tasdfdfd = input_level_custom[callname][counterARG]
@@ -1935,23 +1935,53 @@ function cloneZip(zip) {
     return newZip;
 }
 
-async function InjectToScratch() {
-    const sb3 = await COMPILE_TO_SB3()
-    console.log(sb3)
+function showError(message) {
+    let el = document.getElementById("lua-error-banner");
 
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(sb3);
-    a.download = "project.sb3";
-    a.click();  
+    if (!el) {
+        el = document.createElement("div");
+        el.id = "lua-error-banner";
+
+        el.style.position = "fixed";
+        el.style.top = "0";
+        el.style.left = "0";
+        el.style.width = "100%";
+        el.style.padding = "10px";
+        el.style.background = "red";
+        el.style.color = "white";
+        el.style.zIndex = "999999";
+        el.style.fontFamily = "sans-serif";
+
+        document.body.appendChild(el);
+    }
+
+    el.textContent = message;
 }
 
-document.addEventListener("keydown", function (e) {
-    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "s") {
-        e.preventDefault(); // stop browser save page dialog
-        saveSA1();
-        console.log("Saved .sa1");
+function clearError() {
+    const el = document.getElementById("lua-error-banner");
+    if (el) el.remove();
+}
+
+async function InjectToScratch() {
+    try {
+        clearError();
+
+        const sb3 = await COMPILE_TO_SB3();
+        console.log(sb3);
+
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(sb3);
+        a.download = "project.sb3";
+        a.click();
+
+    } catch (err) {
+        console.error(err);
+
+        showError(err?.message || String(err));
     }
-});
+}
+
 
 </script>
 <script src="code.js"></script>

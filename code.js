@@ -26,9 +26,7 @@ end)
 
 window.editor.onDidChangeModelContent(() => {
     console.log("Text changed!");
-
-    const value = window.editor.getValue();
-    console.log(value);
+    InjectToScratch()
 });
 
 
