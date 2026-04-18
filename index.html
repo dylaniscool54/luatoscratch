@@ -1825,7 +1825,7 @@ function libraryCheck(exid, base, Opcode, args, bid) {
 
     console.log(blocks_to_add)
 
-    sendToExtension("get_base_sb3")
+    sendToExtension(["get_base_sb3", 0])
 
     await waitForBaseSB3()
     let baseZip = cloneZip(window.baseSB3)
