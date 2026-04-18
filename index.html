@@ -106,11 +106,6 @@
             data
         }, "*");
     }
-
-
-    sendToExtension("test")
-
-
     window.addEventListener("message", (event) => {
         if (event.data?.type === "FROM_EXTENSION") {
             console.log(event);
@@ -1960,6 +1955,15 @@ document.addEventListener("keydown", function (e) {
 
 </script>
 <script src="code.js"></script>
+<script>
 
+window.editor.onDidChangeModelContent(() => {
+    console.log("Text changed!");
+
+    const value = editor.getValue();
+    console.log(value);
+});
+
+</script>
 
 </body>
